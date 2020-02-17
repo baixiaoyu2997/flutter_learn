@@ -1,100 +1,72 @@
+import "dart:convert";
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
-void main()=>runApp(MyApp());
+import 'package:http/http.dart' as http;
 
-class MyApp extends StatelessWidget{
-    Widget build (BuildContext context){
-      return MaterialApp(
-        title:'Startup Name Generator',
-        theme:new ThemeData(
-          primaryColor: Colors.white
-        ),
-        home:RandomWords()
-      );
-    }
-}
-class RandomWords extends StatefulWidget{
+
+main() => runApp(SampleApp());
+
+class SampleApp extends StatelessWidget{
   @override
-  createState()=>RandomWordsState();
-}
-class RandomWordsState extends State<RandomWords>{
-  final _suggestions=<WordPair>[];
-  final _saved=new Set<WordPair>();
-  final _biggerFont=const TextStyle(fontSize:18.0);
-  void _pushSaved() {
-    Navigator.of(context).push(
-      new MaterialPageRoute(
-      builder: (context) {
-        final tiles = _saved.map(
-          (pair) {
-            return new ListTile(
-              title: new Text(
-                pair.asPascalCase,
-                style: _biggerFont,
-              ),
-            );
-          },
-        );
-        final divided = ListTile
-          .divideTiles(
-            context: context,
-            tiles: tiles,
-          )
-          .toList();
-        return new Scaffold(
-          appBar: new AppBar(
-            title: new Text('Saved Suggestions'),
-          ),
-          body: new ListView(children: divided),
-        );
-      },
-    ),
+  Widget build(BuildContext context){
+    return  MaterialApp(
+      title:'Sample App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue
+      ),
+      home:SampleAppPage(),
     );
   }
-   Widget build(BuildContext context){
+}
+class SampleAppPage extends StatefulWidget{
+  SampleAppPage({Key key}):super(key:key);
+  @override
+  _SampleAppPageState createState()=>_SampleAppPageState();
+}
+class _SampleAppPageState extends State<SampleAppPage>{
+  List widgets=[];
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+  getListView(){
+    return  ListView.builder(
+        itemCount:widgets.length,
+        itemBuilder:(BuildContext context,int position){
+          return getRow(position);
+        }
+      );
+  }
+  getProgressDialog(){
+    return Center(child:CircularProgressIndicator());
+  }
+  getBody(){
+    if(widgets.length==0){
+      return getProgressDialog();
+    }else {
+      return getListView();
+    }
+  }
+  @override
+  Widget build(BuildContext context){
     return Scaffold(
       appBar:AppBar(
-        title:Text('Startup Name Generator'),
-        actions: <Widget>[
-          new IconButton(icon: new Icon(Icons.list), onPressed: _pushSaved),
-        ],
+        title:Text('Sample App')
       ),
-      body:_buildSuggestions()
+      body: getBody()
     );
   }
-  Widget _buildSuggestions(){
-    return ListView.builder(
-      padding:const EdgeInsets.all(16.0),
-      itemBuilder: (context,i){
-        if(i.isOdd) return Divider();
-        final index=i~/2;
-        if(index>=_suggestions.length){
-          _suggestions.addAll(generateWordPairs().take(10));
-        }
-        return _buildRow(_suggestions[index]);
-      },
+  Widget getRow(int i){
+    return Padding(
+      padding:EdgeInsets.all(10.0),
+      child:Text("Row ${widgets[i]["title"]}")
     );
   }
-  Widget _buildRow(WordPair pair){
-    final alreadySaved=_saved.contains(pair);
-    return ListTile(
-      title:Text(
-        pair.asPascalCase,
-        style:_biggerFont
-      ),
-      trailing:new Icon(
-        alreadySaved?Icons.favorite:Icons.favorite_border,
-        color:alreadySaved?Colors.red:null
-      ),
-      onTap: (){
-        setState((){
-          if(alreadySaved){
-            _saved.remove(pair);
-          }else{
-            _saved.add(pair);
-          }
-        });
-      },
-    );
+  loadData() async{
+    String dataURL="https://jsonplaceholder.typicode.com/posts";
+    http.Response response=await http.get(dataURL);
+    setState(() {
+      widgets=json.decode(response.body);
+    });
   }
 }
