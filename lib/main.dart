@@ -1,72 +1,88 @@
-import "dart:convert";
+// Flutter code sample for BottomNavigationBar
+
+// This example shows a [BottomNavigationBar] as it is used within a [Scaffold]
+// widget. The [BottomNavigationBar] has three [BottomNavigationBarItem]
+// widgets and the [currentIndex] is set to index 0. The selected item is
+// amber. The `_onItemTapped` function changes the selected item's index
+// and displays a corresponding message in the center of the [Scaffold].
+//
+// ![A scaffold with a bottom navigation bar containing three bottom navigation
+// bar items. The first one is selected.](https://flutter.github.io/assets-for-api-docs/assets/material/bottom_navigation_bar.png)
+
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
+void main() => runApp(MyApp());
 
-main() => runApp(SampleApp());
+/// This Widget is the main application widget.
+class MyApp extends StatelessWidget {
+  static const String _title = 'Flutter Code Sample';
 
-class SampleApp extends StatelessWidget{
   @override
-  Widget build(BuildContext context){
-    return  MaterialApp(
-      title:'Sample App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue
-      ),
-      home:SampleAppPage(),
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: _title,
+      home: MyStatefulWidget(),
     );
   }
 }
-class SampleAppPage extends StatefulWidget{
-  SampleAppPage({Key key}):super(key:key);
+
+class MyStatefulWidget extends StatefulWidget {
+  MyStatefulWidget({Key key}) : super(key: key);
+
   @override
-  _SampleAppPageState createState()=>_SampleAppPageState();
+  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
 }
-class _SampleAppPageState extends State<SampleAppPage>{
-  List widgets=[];
-  @override
-  void initState() {
-    super.initState();
-    loadData();
-  }
-  getListView(){
-    return  ListView.builder(
-        itemCount:widgets.length,
-        itemBuilder:(BuildContext context,int position){
-          return getRow(position);
-        }
-      );
-  }
-  getProgressDialog(){
-    return Center(child:CircularProgressIndicator());
-  }
-  getBody(){
-    if(widgets.length==0){
-      return getProgressDialog();
-    }else {
-      return getListView();
-    }
-  }
-  @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar:AppBar(
-        title:Text('Sample App')
-      ),
-      body: getBody()
-    );
-  }
-  Widget getRow(int i){
-    return Padding(
-      padding:EdgeInsets.all(10.0),
-      child:Text("Row ${widgets[i]["title"]}")
-    );
-  }
-  loadData() async{
-    String dataURL="https://jsonplaceholder.typicode.com/posts";
-    http.Response response=await http.get(dataURL);
+
+class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static const List<Widget> _widgetOptions = <Widget>[
+    Text(
+      '任务',
+      style: optionStyle,
+    ),
+    Text(
+      '应用',
+      style: optionStyle,
+    ),
+    Text(
+      '我的',
+      style: optionStyle,
+    ),
+  ];
+
+  void _onItemTapped(int index) {
     setState(() {
-      widgets=json.decode(response.body);
+      _selectedIndex = index;
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: _widgetOptions[_selectedIndex],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.flag),
+            title: Text('任务'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            title: Text('应用'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.perm_identity),
+            title: Text('我的'),
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Color(0xFF3fa2f7),
+        onTap: _onItemTapped,
+      ),
+    );
   }
 }
