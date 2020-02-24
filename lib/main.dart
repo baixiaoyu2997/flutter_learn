@@ -10,7 +10,7 @@
 // bar items. The first one is selected.](https://flutter.github.io/assets-for-api-docs/assets/material/bottom_navigation_bar.png)
 
 import 'package:flutter/material.dart';
-
+import 'application.dart';
 void main() => runApp(MyApp());
 
 /// This Widget is the main application widget.
@@ -42,10 +42,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       '任务',
       style: optionStyle,
     ),
-    Text(
-      '应用',
-      style: optionStyle,
-    ),
+    Application(),
     Text(
       '我的',
       style: optionStyle,
