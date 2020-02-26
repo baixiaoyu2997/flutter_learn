@@ -21,36 +21,47 @@ class _ApplicationState extends State<Application> {
   ];
   @override
   Widget build(BuildContext context) {
-    return _ApplicationItem(name:menuList[1]['name']);
+    return GridView.count(
+        padding: EdgeInsets.only(top: 20, left: 10, right: 8), // 边距
+        crossAxisCount: 3, // 设置Grid布局为3列
+        childAspectRatio: 0.8, // 子部件表格宽高比
+        children: List<Widget>.generate(menuList.length, (int rowIndex) {
+          return _ApplicationItem(menu: menuList[rowIndex]);
+        }));
   }
 }
 
 class _ApplicationItem extends StatelessWidget {
-  _ApplicationItem({Key key, this.name}) : super(key: key);
-  String name;
+  _ApplicationItem({Key key, this.menu}) : super(key: key);
+  Map menu;
 
   @override
   Widget build(BuildContext context) {
-    return RawMaterialButton(
-      padding: EdgeInsets.all(30.0), // 边距
-      hoverColor: Colors.black.withOpacity(0.05), // 点击按钮颜色
-      onPressed: () {
-        // 点击事件
-        print('onPressed');
-      },
-      child: SizedBox(
-          height: 100,
-          // 用来限制子部件高度
-          child: Column(
-        // 垂直布局
-        children: <Widget>[
-          Image.network(
-            "http://leandc.cn/platform/mainImg/order.png",
-            width: 50,
-          ),
-          Text(name)
-        ],
-      )),
-    );
+    return RepaintBoundary(
+        // 优化性能，局部渲染
+        child: RawMaterialButton(
+            // 按钮部件
+            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 27.0), // 边距
+            hoverColor: Colors.black.withOpacity(0.05), // 点击按钮颜色
+            onPressed: () {
+              // 点击事件
+              print('onPressed');
+            },
+            child: Column(
+              // Column布局
+              mainAxisSize: MainAxisSize.min, // 主轴大小
+              // 垂直布局
+              children: <Widget>[
+                Image.network(
+                  // 图片
+                  menu['mobileIcon'],
+                ),
+                SizedBox(
+                  // 间隔
+                  height: 10,
+                ),
+                Text(menu['name'], style: TextStyle(fontSize: 18)) // 文字
+              ],
+            )));
   }
 }
