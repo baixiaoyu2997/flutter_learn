@@ -34,7 +34,9 @@ class _LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<_LoginForm> {
   List titleList = ['验证码登录', '密码登录'];
-  int activeTab = 0;
+  int activeTab = 1;
+  final Color activedColor = Color(0xff2248ec);
+
   changeActiveTab(index) {
     setState(() {
       activeTab = index;
@@ -46,16 +48,17 @@ class _LoginFormState extends State<_LoginForm> {
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5.0),
-        color: Color.fromRGBO(255, 255, 255, 0.9),
+        color: Color.fromRGBO(255, 255, 255, 0.95),
       ),
       child: DefaultTabController(
         length: titleList.length,
+        initialIndex: activeTab,
         child: new Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(30),
             child: AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.transparent,
               // centerTitle: true,
               elevation: 0.0, //导航栏下面阴影
               flexibleSpace: Column(
@@ -72,8 +75,6 @@ class _LoginFormState extends State<_LoginForm> {
   }
 
   Widget _buildTabBar() {
-    final Color activedColor = Color(0xff2248ec);
-
     return TabBar(
       isScrollable: false, //是否可滑动
       unselectedLabelColor: Color(0xff61656b), //未选中文字颜色
@@ -97,7 +98,7 @@ class _LoginFormState extends State<_LoginForm> {
 
 class _FormWidget extends StatefulWidget {
   _FormWidget({Key key}) : super(key: key);
-
+  bool _hidePassWord = true;
   @override
   _FormWidgetState createState() => _FormWidgetState();
 }
@@ -121,14 +122,56 @@ class _FormWidgetState extends State<_FormWidget> {
                 controller: _phoneController,
                 decoration: InputDecoration(hintText: "请输入手机号"),
               ),
-              TextFormField(
-                // autofocus: true,
-                // controller: _phoneController,
-                decoration: InputDecoration(hintText: "请输入密码"),
+              Stack(
+                children: <Widget>[
+                  TextFormField(
+                    // autofocus: true,
+                    // controller: _phoneController,
+                    obscureText: widget._hidePassWord,
+                    decoration: InputDecoration(hintText: "请输入密码"),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      GestureDetector(
+                        // 手势检测
+                        child: Icon(
+                          widget._hidePassWord
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Color(0xffa2a7a8),
+                        ),
+                        onTap: () {
+                          print(widget._hidePassWord);
+                          setState(() {
+                            widget._hidePassWord = !widget._hidePassWord;
+                          });
+                        },
+                      ),
+                      OutlineButton(
+                        onPressed: () {},
+                        child: Text('忘记密码'),
+                        textColor: Color(0xff4a4a4a),
+                        borderSide:
+                            BorderSide(width: 2.0, style: BorderStyle.none),
+                      ),
+                    ],
+                  )
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 40),
                 child: gradientButton(),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Text('没有账号？', style: TextStyle(color: Color(0xff95999f))),
+                    Text('立即注册', style: TextStyle(color: Color(0xff2248ec)))
+                  ],
+                ),
               )
             ],
           ),
@@ -136,32 +179,33 @@ class _FormWidgetState extends State<_FormWidget> {
       ),
     );
   }
+
   // 登录按钮
   Widget gradientButton() {
     return Container(
       decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [Color(0xff144bfe), Color(0xff0e81ff)]),// 渐变色
-          borderRadius: BorderRadius.circular(5)
-      ),
+          gradient: LinearGradient(
+              colors: [Color(0xff144bfe), Color(0xff0e81ff)]), // 渐变色
+          borderRadius: BorderRadius.circular(5)),
       child: RaisedButton(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5)
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         color: Colors.transparent, // 设为透明色
         elevation: 0, // 正常时阴影隐藏
         highlightElevation: 0, // 点击时阴影隐藏
-        onPressed: (){},
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return HomeWidget();
+          }));
+        },
         child: Container(
           alignment: Alignment.center,
           height: 50,
-          child: Text('登 录', style: TextStyle(color: Colors.white, fontSize: 20),),
+          child: Text(
+            '登 录',
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
         ),
       ),
     );
   }
 }
-// onPressed: () {
-//               Navigator.push(context, MaterialPageRoute(builder: (context) {
-//                 return HomeWidget();
-//               }));
-//             }
