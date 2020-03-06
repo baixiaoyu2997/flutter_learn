@@ -216,7 +216,8 @@ class _FormWidgetState extends State<_FormWidget> {
                 "token": "${_phoneController.text}::${_pwdController.text}",
                 "imageCode": ""
               });
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
                 return HomeWidget();
               }));
             } catch (error) {
