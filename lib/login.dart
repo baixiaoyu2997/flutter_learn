@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
+import 'package:dio/dio.dart';
+import './common/loading.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+Dio dio = new Dio();
 
 class LoginWidget extends StatefulWidget {
   LoginWidget({Key key}) : super(key: key);
@@ -105,6 +110,8 @@ class _FormWidget extends StatefulWidget {
 
 class _FormWidgetState extends State<_FormWidget> {
   TextEditingController _phoneController = TextEditingController();
+  TextEditingController _pwdController = TextEditingController();
+  GlobalKey _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -113,7 +120,8 @@ class _FormWidgetState extends State<_FormWidget> {
       child: FractionallySizedBox(
         widthFactor: 0.93,
         child: Form(
-          autovalidate: true,
+          key: _formKey,
+          // autovalidate: true,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -121,14 +129,19 @@ class _FormWidgetState extends State<_FormWidget> {
                 // autofocus: true,
                 controller: _phoneController,
                 decoration: InputDecoration(hintText: "请输入手机号"),
+                validator: (v) {
+                  return v.trim().isNotEmpty ? null : '手机号不能为空';
+                },
               ),
               Stack(
                 children: <Widget>[
                   TextFormField(
-                    // autofocus: true,
-                    // controller: _phoneController,
+                    controller: _pwdController,
                     obscureText: widget._hidePassWord,
                     decoration: InputDecoration(hintText: "请输入密码"),
+                    validator: (v) {
+                      return v.trim().isNotEmpty ? null : '密码不能为空';
+                    },
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -192,10 +205,32 @@ class _FormWidgetState extends State<_FormWidget> {
         color: Colors.transparent, // 设为透明色
         elevation: 0, // 正常时阴影隐藏
         highlightElevation: 0, // 点击时阴影隐藏
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return HomeWidget();
-          }));
+        onPressed: () async {
+          if ((_formKey.currentState as FormState).validate()) {
+            showLoading(context);
+            try {
+              Response response = await dio
+                  .post("https://hwdc-17.leandc.cn/v3/common/jwt_auth", data: {
+                "appid": "app:mybaas",
+                "provider": "password",
+                "token": "${_phoneController.text}::${_pwdController.text}",
+                "imageCode": ""
+              });
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return HomeWidget();
+              }));
+            } catch (error) {
+              Navigator.of(context).pop();
+              Fluttertoast.showToast(
+                  msg: '用户名密码错误',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIos: 1,
+                  backgroundColor: Color.fromRGBO(0, 0, 0, 0.9),
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+          }
         },
         child: Container(
           alignment: Alignment.center,
