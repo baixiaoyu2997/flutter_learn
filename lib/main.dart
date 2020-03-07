@@ -3,12 +3,21 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import './model/LoginModel.dart';
 import 'login.dart';
+import './model/UserModel.dart';
 
 void main() => runApp(
+      MultiProvider(
+        providers: [
   ChangeNotifierProvider<LoginModel>(
-    create: (_)=>LoginModel(),
-    child:MyApp()
-  ));
+            create: (_) => LoginModel(),
+          ),
+          ChangeNotifierProvider<UserModel>(
+            create: (_) => UserModel(),
+          )
+        ],
+        child: MyApp(),
+      ),
+    );
 
 /// This Widget is the main application widget.
 class MyApp extends StatelessWidget {

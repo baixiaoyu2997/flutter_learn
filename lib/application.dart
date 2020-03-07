@@ -1,7 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import './common/loading.dart';
+import 'package:provider/provider.dart';
+import './model/LoginModel.dart';
+import './model/UserModel.dart';
 
 Dio dio = new Dio();
+
 class Application extends StatefulWidget {
   const Application({Key key}) : super(key: key);
   @override
@@ -9,18 +16,7 @@ class Application extends StatefulWidget {
 }
 
 class _ApplicationState extends State<Application> {
-  var menuList = <Map>[
-    {'name': '订单', 'mobileIcon': 'http://leandc.cn/platform/mainImg/order.png'},
-    {
-      'name': '快修',
-      'mobileIcon': 'http://leandc.cn/platform/mainImg/deviceFix.png'
-    },
-    {
-      'name': '生产',
-      'mobileIcon': 'http://leandc.cn/platform/mainImg/production.png'
-    },
-    {'name': '设置', 'mobileIcon': 'http://leandc.cn/platform/mainImg/set.png'}
-  ];
+  List menuList = [];
   @override
   void initState() {
     super.initState();
@@ -36,13 +32,34 @@ class _ApplicationState extends State<Application> {
           return _ApplicationItem(menu: menuList[rowIndex]);
         }));
   }
-   getMenu()async {
-      Response response = await dio
-            .post("https://hwdc-17.leandc.cn/v3/common/jwt_auth", data: {
-          "userId": "05J4BP8GPR2DSWY1",
+
+  getMenu() async {
+    Future.delayed(Duration.zero, () {
+       showLoading(context);
+    });
+    try {
+      Response response = await dio.get(
+        "https://hwdc-17.leandc.cn/v3/common/rbac/menu",
+        queryParameters: {
+          "userId": Provider.of<UserModel>(context, listen: false).userId,
           "targetPlatform": "mobileOnly"
-        });
-        print(response);
+        },
+        options: Options(
+          headers: {
+            HttpHeaders.authorizationHeader:
+                Provider.of<LoginModel>(context, listen: false).auth,
+          },
+        ),
+      );
+      // 关闭loading
+      Navigator.of(context).pop();
+      setState(() {
+        menuList = response.data['items'];
+      });
+    } catch (e) {
+      // 关闭loading
+      Navigator.of(context).pop();
+    }
   }
 }
 

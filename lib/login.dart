@@ -5,6 +5,7 @@ import './common/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import './model/LoginModel.dart';
+import './model/UserModel.dart';
 
 Dio dio = new Dio();
 
@@ -255,6 +256,8 @@ class _FormWidgetState extends State<_FormWidget> {
         });
         // 全局状态修改：赋值auth
         Provider.of<LoginModel>(context, listen: false).update(response.data['jwt']['access_token']);
+        // 全局状态修改：赋值userId 
+        Provider.of<UserModel>(context, listen: false).update(response.data['user']['id']);
         // 关闭loading
         Navigator.of(context).pop();
         // 跳转到home页
