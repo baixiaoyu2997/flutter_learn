@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 
+Dio dio = new Dio();
 class Application extends StatefulWidget {
   const Application({Key key}) : super(key: key);
   @override
@@ -20,6 +22,11 @@ class _ApplicationState extends State<Application> {
     {'name': '设置', 'mobileIcon': 'http://leandc.cn/platform/mainImg/set.png'}
   ];
   @override
+  void initState() {
+    super.initState();
+    getMenu();
+  }
+  @override
   Widget build(BuildContext context) {
     return GridView.count(
         padding: EdgeInsets.only(top: 20, left: 10, right: 8), // 边距
@@ -29,11 +36,19 @@ class _ApplicationState extends State<Application> {
           return _ApplicationItem(menu: menuList[rowIndex]);
         }));
   }
+   getMenu()async {
+      Response response = await dio
+            .post("https://hwdc-17.leandc.cn/v3/common/jwt_auth", data: {
+          "userId": "05J4BP8GPR2DSWY1",
+          "targetPlatform": "mobileOnly"
+        });
+        print(response);
+  }
 }
 
 class _ApplicationItem extends StatelessWidget {
   _ApplicationItem({Key key, this.menu}) : super(key: key);
-  Map menu;
+  final Map menu;
 
   @override
   Widget build(BuildContext context) {

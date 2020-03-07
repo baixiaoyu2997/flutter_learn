@@ -3,6 +3,8 @@ import 'home.dart';
 import 'package:dio/dio.dart';
 import './common/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import './model/LoginModel.dart';
 
 Dio dio = new Dio();
 
@@ -123,12 +125,13 @@ class _LoginFormState extends State<_LoginForm> {
 
 class _FormWidget extends StatefulWidget {
   _FormWidget({Key key}) : super(key: key);
-  bool _hidePassWord = true;
   @override
   _FormWidgetState createState() => _FormWidgetState();
 }
 
 class _FormWidgetState extends State<_FormWidget> {
+  bool hidePassWord=true;
+
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _pwdController = TextEditingController();
   GlobalKey _formKey = GlobalKey<FormState>();
@@ -157,7 +160,7 @@ class _FormWidgetState extends State<_FormWidget> {
                 children: <Widget>[
                   TextFormField(
                     controller: _pwdController,
-                    obscureText: widget._hidePassWord,
+                    obscureText: hidePassWord,
                     decoration: InputDecoration(hintText: "请输入密码"),
                     validator: (v) {
                       return v.trim().isNotEmpty ? null : '密码不能为空';
@@ -169,15 +172,15 @@ class _FormWidgetState extends State<_FormWidget> {
                       GestureDetector(
                         // 手势检测
                         child: Icon(
-                          widget._hidePassWord
+                          hidePassWord
                               ? Icons.visibility_off
                               : Icons.visibility,
                           color: Color(0xffa2a7a8),
                         ),
                         onTap: () {
-                          print(widget._hidePassWord);
+                          print(hidePassWord);
                           setState(() {
-                            widget._hidePassWord = !widget._hidePassWord;
+                            hidePassWord = !hidePassWord;
                           });
                         },
                       ),
@@ -242,6 +245,7 @@ class _FormWidgetState extends State<_FormWidget> {
     if ((_formKey.currentState as FormState).validate()) {
       showLoading(context);
       try {
+        // 调用登录接口
         Response response = await dio
             .post("https://hwdc-17.leandc.cn/v3/common/jwt_auth", data: {
           "appid": "app:mybaas",
@@ -249,12 +253,17 @@ class _FormWidgetState extends State<_FormWidget> {
           "token": "${_phoneController.text}::${_pwdController.text}",
           "imageCode": ""
         });
+        // 全局状态修改：赋值auth
+        Provider.of<LoginModel>(context, listen: false).update(response.data['jwt']['access_token']);
+        // 关闭loading
         Navigator.of(context).pop();
+        // 跳转到home页
         Navigator.of(context)
             .pushReplacement(MaterialPageRoute(builder: (context) {
           return HomeWidget();
         }));
       } catch (error) {
+        print(error);
         Navigator.of(context).pop();
         Fluttertoast.showToast(
             msg: '用户名密码错误',
