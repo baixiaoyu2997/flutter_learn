@@ -13,20 +13,40 @@ class LoginWidget extends StatefulWidget {
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
+  DateTime _lastPressedAt; //上次点击时间
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("images/login_bg.png"),
-          fit: BoxFit.fill,
+    return WillPopScope(
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/login_bg.png"),
+            fit: BoxFit.fill,
+          ),
+        ),
+        child: FractionallySizedBox(
+          widthFactor: 0.93,
+          heightFactor: 0.68,
+          child: _LoginForm(),
         ),
       ),
-      child: FractionallySizedBox(
-        widthFactor: 0.93,
-        heightFactor: 0.68,
-        child: _LoginForm(),
-      ),
+      onWillPop: () async {
+        if (_lastPressedAt == null ||
+            DateTime.now().difference(_lastPressedAt) > Duration(seconds: 1)) {
+          //两次点击间隔超过1秒则重新计时
+          _lastPressedAt = DateTime.now();
+          Fluttertoast.showToast(
+              msg: '请再按一次退出',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIos: 1,
+              backgroundColor: Color.fromRGBO(0, 0, 0, 0.9),
+              textColor: Colors.white,
+              fontSize: 16.0);
+          return false;
+        }
+        return true;
+      },
     );
   }
 }
@@ -205,34 +225,7 @@ class _FormWidgetState extends State<_FormWidget> {
         color: Colors.transparent, // 设为透明色
         elevation: 0, // 正常时阴影隐藏
         highlightElevation: 0, // 点击时阴影隐藏
-        onPressed: () async {
-          if ((_formKey.currentState as FormState).validate()) {
-            showLoading(context);
-            try {
-              Response response = await dio
-                  .post("https://hwdc-17.leandc.cn/v3/common/jwt_auth", data: {
-                "appid": "app:mybaas",
-                "provider": "password",
-                "token": "${_phoneController.text}::${_pwdController.text}",
-                "imageCode": ""
-              });
-              Navigator.of(context).pop();
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
-                return HomeWidget();
-              }));
-            } catch (error) {
-              Navigator.of(context).pop();
-              Fluttertoast.showToast(
-                  msg: '用户名密码错误',
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIos: 1,
-                  backgroundColor: Color.fromRGBO(0, 0, 0, 0.9),
-                  textColor: Colors.white,
-                  fontSize: 16.0);
-            }
-          }
-        },
+        onPressed: _doLogin,
         child: Container(
           alignment: Alignment.center,
           height: 50,
@@ -243,5 +236,35 @@ class _FormWidgetState extends State<_FormWidget> {
         ),
       ),
     );
+  }
+
+  void _doLogin() async {
+    if ((_formKey.currentState as FormState).validate()) {
+      showLoading(context);
+      try {
+        Response response = await dio
+            .post("https://hwdc-17.leandc.cn/v3/common/jwt_auth", data: {
+          "appid": "app:mybaas",
+          "provider": "password",
+          "token": "${_phoneController.text}::${_pwdController.text}",
+          "imageCode": ""
+        });
+        Navigator.of(context).pop();
+        Navigator.of(context)
+            .pushReplacement(MaterialPageRoute(builder: (context) {
+          return HomeWidget();
+        }));
+      } catch (error) {
+        Navigator.of(context).pop();
+        Fluttertoast.showToast(
+            msg: '用户名密码错误',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIos: 1,
+            backgroundColor: Color.fromRGBO(0, 0, 0, 0.9),
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    }
   }
 }
