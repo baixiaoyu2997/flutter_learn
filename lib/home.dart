@@ -26,14 +26,18 @@ class _HomeWidgetState extends State<HomeWidget> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      '任务',
-      style: optionStyle,
+    Center(
+      child: Text(
+        '请前往应用->订单',
+        style: optionStyle,
+      ),
     ),
     Application(),
-    Text(
-      '我的',
-      style: optionStyle,
+    Center(
+      child: Text(
+        '请前往应用->订单',
+        style: optionStyle,
+      ),
     ),
   ];
 
