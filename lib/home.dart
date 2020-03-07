@@ -28,14 +28,14 @@ class _HomeWidgetState extends State<HomeWidget> {
   static const List<Widget> _widgetOptions = <Widget>[
     Center(
       child: Text(
-        '请前往应用->订单',
+        '请前往应用->设置',
         style: optionStyle,
       ),
     ),
     Application(),
     Center(
       child: Text(
-        '请前往应用->订单',
+        '请前往应用->设置',
         style: optionStyle,
       ),
     ),
