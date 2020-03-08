@@ -6,6 +6,7 @@ import './common/loading.dart';
 import 'package:provider/provider.dart';
 import './model/LoginModel.dart';
 import './model/UserModel.dart';
+import './common/ListMenu.dart';
 
 Dio dio = new Dio();
 
@@ -22,6 +23,7 @@ class _ApplicationState extends State<Application> {
     super.initState();
     getMenu();
   }
+
   @override
   Widget build(BuildContext context) {
     return GridView.count(
@@ -35,7 +37,7 @@ class _ApplicationState extends State<Application> {
 
   getMenu() async {
     Future.delayed(Duration.zero, () {
-       showLoading(context);
+      showLoading(context);
     });
     try {
       Response response = await dio.get(
@@ -77,7 +79,10 @@ class _ApplicationItem extends StatelessWidget {
             hoverColor: Colors.black.withOpacity(0.05), // 点击按钮颜色
             onPressed: () {
               // 点击事件
-              print('onPressed');
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) {
+                return ListMenu(title: menu['name'],parentid: menu['id']);
+              }));
             },
             child: Column(
               // Column布局
