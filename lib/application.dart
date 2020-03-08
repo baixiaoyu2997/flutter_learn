@@ -41,7 +41,7 @@ class _ApplicationState extends State<Application> {
     });
     try {
       Response response = await dio.get(
-        "https://hwdc-17.leandc.cn/v3/common/rbac/menu",
+        "http://leandc.cn/v3/common/rbac/menu",
         queryParameters: {
           "userId": Provider.of<UserModel>(context, listen: false).userId,
           "targetPlatform": "mobileOnly"

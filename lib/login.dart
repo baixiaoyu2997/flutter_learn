@@ -248,7 +248,7 @@ class _FormWidgetState extends State<_FormWidget> {
       try {
         // 调用登录接口
         Response response = await dio
-            .post("https://hwdc-17.leandc.cn/v3/common/jwt_auth", data: {
+            .post("http://leandc.cn/v3/common/jwt_auth", data: {
           "appid": "app:mybaas",
           "provider": "password",
           "token": "${_phoneController.text}::${_pwdController.text}",
