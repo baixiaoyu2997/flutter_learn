@@ -18,7 +18,7 @@ class ListMenu extends StatefulWidget {
 }
 
 class _ListMenuState extends State<ListMenu> {
-  List _menuData = [];
+  List<Map> _menuData = [];
   @override
   void initState() {
     super.initState();
@@ -65,16 +65,11 @@ class _ListMenuState extends State<ListMenu> {
       // 关闭loading
       Navigator.of(context).pop();
       setState(() {
-        try {
-          List items=response.data['items'];
-          _menuData =items.where((x) => x['mobileIcon']!='');
-        } catch (e) {
-          print(e);
-        }
-        print(_menuData);
+        _menuData = response.data['items'].where((x) =>  x['mobileIcon'] !=null);
       });
       print(_menuData);
     } catch (e) {
+      print(e);
       // 关闭loading
       Navigator.of(context).pop();
     }
@@ -98,7 +93,7 @@ class _ListMenuState extends State<ListMenu> {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) {
         setState(() {
-          _menuData[index].isExpanded = !isExpanded;
+          _menuData[index]['isExpanded'] = !isExpanded;
         });
       },
       children: _menuData.map<ExpansionPanel>((item) {
