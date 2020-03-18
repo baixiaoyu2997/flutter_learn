@@ -56,7 +56,9 @@ class _ApplicationState extends State<Application> {
       // 关闭loading
       Navigator.of(context).pop();
       setState(() {
-        menuList = response.data['items'].where((x)=>x['mobileIcon']!=null).toList();
+        menuList = response.data['items']
+            .where((x) => x['mobileIcon'] != null)
+            .toList();
       });
     } catch (e) {
       // 关闭loading
@@ -75,13 +77,12 @@ class _ApplicationItem extends StatelessWidget {
         // 优化性能，局部渲染
         child: RawMaterialButton(
             // 按钮部件
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 27.0), // 边距
+
             hoverColor: Colors.black.withOpacity(0.05), // 点击按钮颜色
             onPressed: () {
               // 点击事件
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) {
-                return ListMenu(title: menu['name'],parentid: menu['id']);
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return ListMenu(title: menu['name'], parentid: menu['id']);
               }));
             },
             child: Column(
@@ -89,9 +90,13 @@ class _ApplicationItem extends StatelessWidget {
               mainAxisSize: MainAxisSize.min, // 主轴大小
               // 垂直布局
               children: <Widget>[
-                Image.network(
-                  // 图片
-                  menu['mobileIcon'],
+                Padding(
+                  padding:
+                      EdgeInsets.symmetric(vertical: 0, horizontal: 27.0), // 边距
+                  child: Image.network(
+                    // 图片
+                    menu['mobileIcon'],
+                  ),
                 ),
                 SizedBox(
                   // 间隔

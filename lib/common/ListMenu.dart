@@ -38,7 +38,9 @@ class _ListMenuState extends State<ListMenu> {
         ),
         centerTitle: false,
       ),
-      body: ListView(children: _menuItem()),
+      body: ListView(
+          children: ListTile.divideTiles(context: context, tiles: _menuItem())
+              .toList()),
     );
   }
 
@@ -82,23 +84,31 @@ class _ListMenuState extends State<ListMenu> {
     }
   }
 
-  List<Widget> _menuItem() {
+  _menuItem() {
     return _menuData.map((item) {
-     return Material(
+      return Material(
         color: Colors.white,
         child: InkWell(
             onTap: () {},
             child: ListTile(
-              leading: CircleAvatar(
-                radius: 11,
-                backgroundImage:
-                    NetworkImage(item['mobileIcon']),
+              title: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 11,
+                    backgroundImage: NetworkImage(item['mobileIcon']),
+                  ),
+                  SizedBox(width: 14),
+                  Text(
+                    item['name'],
+                    textAlign: TextAlign.right,
+                  )
+                ],
               ),
-              title: Text(item['name']),
               trailing: Icon(Icons.chevron_right),
             )),
       );
-    }).toList();
+    });
   }
 
   // Widget _menuExpendList() {
