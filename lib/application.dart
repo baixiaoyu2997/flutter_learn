@@ -56,7 +56,7 @@ class _ApplicationState extends State<Application> {
       // 关闭loading
       Navigator.of(context).pop();
       setState(() {
-        menuList = response.data['items'];
+        menuList = response.data['items'].where((x)=>x['mobileIcon']!=null).toList();
       });
     } catch (e) {
       // 关闭loading
