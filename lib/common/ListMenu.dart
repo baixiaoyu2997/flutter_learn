@@ -18,7 +18,7 @@ class ListMenu extends StatefulWidget {
 }
 
 class _ListMenuState extends State<ListMenu> {
-  List<Map> _menuData = [];
+  List<dynamic> _menuData = [];
   @override
   void initState() {
     super.initState();
@@ -38,7 +38,7 @@ class _ListMenuState extends State<ListMenu> {
         ),
         centerTitle: false,
       ),
-      body: ListView(children: <Widget>[_menuItem(), _menuExpendList()]),
+      body: ListView(children: <Widget>[_menuExpendList()]),
     );
   }
 
@@ -64,10 +64,16 @@ class _ListMenuState extends State<ListMenu> {
       );
       // 关闭loading
       Navigator.of(context).pop();
+      // 过滤无用数据
+      List<dynamic> filterData =
+          response.data['items'].where((x) => x['mobileIcon'] != null&&x['dataType']=='function').toList();
+      // 默认都是关闭状态
+      for (var item in filterData) {
+        item['isExpanded'] = false;
+      }
       setState(() {
-        _menuData = response.data['items'].where((x) =>  x['mobileIcon'] !=null);
+        _menuData = filterData;
       });
-      print(_menuData);
     } catch (e) {
       print(e);
       // 关闭loading
@@ -76,40 +82,47 @@ class _ListMenuState extends State<ListMenu> {
   }
 
   Widget _menuItem() {
-    return InkWell(
-        onTap: () {},
-        child: ListTile(
-          leading: CircleAvatar(
-            radius: 11,
-            backgroundImage:
-                NetworkImage('https://s2.ax1x.com/2019/08/16/mZeD4P.png'),
-          ),
-          title: Text('Three-line ListTile'),
-          trailing: Icon(Icons.chevron_right),
-        ));
+    return Container(
+      color: Colors.white,
+      child: InkWell(
+          onTap: () {},
+          child: ListTile(
+            leading: CircleAvatar(
+              radius: 11,
+              backgroundImage:
+                  NetworkImage('https://s2.ax1x.com/2019/08/16/mZeD4P.png'),
+            ),
+            title: Text('Three-line ListTile'),
+            trailing: Icon(Icons.chevron_right),
+          )),
+    );
   }
 
   Widget _menuExpendList() {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) {
-        setState(() {
-          _menuData[index]['isExpanded'] = !isExpanded;
-        });
+        if (index.isEven) {
+          setState(() {
+            print(isExpanded);
+            _menuData[index]['isExpanded'] = !isExpanded;
+          });
+        }
       },
       children: _menuData.map<ExpansionPanel>((item) {
         return ExpansionPanel(
-          canTapOnHeader: true,
-          headerBuilder: (BuildContext context, bool isExpanded) {
-            return ListTile(
-              leading: CircleAvatar(
-                radius: 11,
-                backgroundImage: NetworkImage(item['mobileIcon']),
-              ),
-              title: Text(item['name']),
-            );
-          },
-          body: Text('test'),
-        );
+            canTapOnHeader: true,
+            headerBuilder: (BuildContext context, bool isExpanded) {
+              print(context);
+              return ListTile(
+                leading: CircleAvatar(
+                  radius: 11,
+                  backgroundImage: NetworkImage(item['mobileIcon']),
+                ),
+                title: Text(item['name']),
+              );
+            },
+            body: Text('test'),
+            isExpanded: item['isExpanded']);
       }).toList(),
     );
   }
